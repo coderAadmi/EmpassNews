@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/ppp">
+        <item
+            android:id="@+id/menu_subscribe_us"
+            android:title="Subscribe Us!"></item>
+        <item
+            android:id="@+id/menu_rate_us"
+            android:title="Rate Us!"></item>
+        <item
+            android:id="@+id/menu_contact_us"
+            android:title="Contact Us"></item>
+    </group>
+
+</menu>

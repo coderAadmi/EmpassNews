@@ -1,6 +1,6 @@
 # EmpassNews
 Shows you news about your environment.
-USed my own library.
+USed my own library. ( implementation 'com.github.coderAadmi:PradyForm:3a07aa067e')
 Screenshots:
 ![](screenshots/1.png)
 ![](screenshots/2.png)

@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
 
-public class NewsPagerAdapter extends FragmentStatePagerAdapter {
+public class NewsPagerAdapter extends FragmentPagerAdapter {
 
     ArrayList<NewsFragment> mNewsFragmentList;
     public static String[] PageTitles = {"TOP","Sports","Business","Health","Science","Tech","Fun","ALL"};

@@ -31,6 +31,8 @@ public interface NewsDao {
     @Query("Select * from news where date_of_publishing = :publishedAt")
     List<News> getAllNewsByDate(String publishedAt);
 
+    @Query("Delete from news")
+    void deleteAll();
 
 
 }

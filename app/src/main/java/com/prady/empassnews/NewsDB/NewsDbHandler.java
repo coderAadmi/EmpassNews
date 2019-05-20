@@ -50,6 +50,12 @@ public class NewsDbHandler{
         return null;
     }
 
+    public void deleteAllNews()
+    {
+        DeleteAllNews deleteAllNews = new DeleteAllNews();
+        deleteAllNews.execute();
+    }
+
     public class InsertNews extends AsyncTask<News,Void,Void>{
 
         @Override
@@ -90,6 +96,16 @@ public class NewsDbHandler{
         @Override
         protected List<News> doInBackground(String... strings) {
             return newsDao.getAllNewsByDate(strings[0]);
+        }
+    }
+
+    public class DeleteAllNews extends AsyncTask<Void,Void,Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            newsDao.deleteAll();
+            return null;
         }
     }
 }

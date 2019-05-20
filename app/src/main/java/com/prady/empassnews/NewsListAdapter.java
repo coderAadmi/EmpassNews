@@ -10,21 +10,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.prady.empassnews.NewsApi.Articles;
 import com.prady.empassnews.NewsApi.NewsItem;
+import com.prady.empassnews.NewsApi.NewsRetrofitApi;
 import com.prady.empassnews.NewsDB.News;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsViewHolder>{
 
     private ArrayList<News> newsList;
     private Context context;
+    private int name;
 
     public NewsListAdapter(ArrayList<News> newsList, Context context) {
         this.newsList = newsList;
+        Toast.makeText(context,"DOWN",Toast.LENGTH_SHORT).show();
         this.context = context;
     }
 

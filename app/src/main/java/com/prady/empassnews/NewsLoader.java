@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ProgressBar;
@@ -22,10 +24,16 @@ import com.prady.empassnews.NewsDB.NewsDao;
 import com.prady.empassnews.NewsDB.NewsDatabase;
 import com.prady.empassnews.NewsDB.NewsDbHandler;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NewsLoader extends AsyncTask<Void,Void,Void> {
 
@@ -33,6 +41,7 @@ public class NewsLoader extends AsyncTask<Void,Void,Void> {
     private NewsItem[] newsList;
     int pos;
     boolean isDone;
+    private int count;
 
     private Context context;
 
@@ -57,54 +66,213 @@ public class NewsLoader extends AsyncTask<Void,Void,Void> {
         NetworkInfo networkInfo = connectivity.getActiveNetworkInfo();
         if(networkInfo!=null && networkInfo.isConnected())
         {
-            for(int i=0;i<8;i++)
-            {
-                Retrofit retrofit = NewsApiInstance.getInstance();
+            newsDbHandler.deleteAllNews();
+            count = 0;
+            for(int i=0;i<8;i++) {
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(NewsRetrofitApi.BASE_URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
                 NewsRetrofitApi api = retrofit.create(NewsRetrofitApi.class);
                 Call<NewsItem> call = null;
-                pos =i;
-                switch (i)
-                {
-                    case 0:call = api.getTopIndianNews();break;
-                    case 1:call = api.getTopSportNews();break;
-                    case 2:call = api.getTopBusinessNews();break;
-                    case 3:call = api.getTopHealthNews();break;
-                    case 4:call = api.getTopScienceNews();break;
-                    case 5:call = api.getTopTechNews();break;
-                    case 6:call = api.getTopEntertainmentNews();break;
-                    case 7:break;
-                }
-                if(i<7)
-                {
-                    call.enqueue(new Callback<NewsItem>() {
-                        @Override
-                        public void onResponse(Call<NewsItem> call, Response<NewsItem> response) {
-                            //newsList[pos] = response.body();
-                            Articles[] articles = response.body().getArticles();
-                            for(int i=0;i<articles.length;i++)
-                            {
-                                News news = new News(articles[i].getTitle(),articles[i].getUrlToImage(),articles[i].getUrl(),articles[i].getPublishedAt(),pos);
-                                newsDbHandler.insertNews(news);
+                pos = i;
+                switch (i) {
+                    case 0:
+                        call = api.getTopIndianNews();
+                        call.enqueue(new Callback<NewsItem>() {
+                            @Override
+                            public void onResponse(Call<NewsItem> call, Response<NewsItem> response) {
+                                Articles[] articles = response.body().getArticles();
+                                for (int i = 0; i < articles.length; i++) {
+                                    News news = new News(articles[i].getTitle(), articles[i].getUrlToImage(), articles[i].getUrl(), articles[i].getPublishedAt(), 0);
+                                    newsDbHandler.insertNews(news);
+                                    Log.d("NEWS_DB_0", news.getTitle() + " Type: 0");
+                                    setCount();
+                                }
                             }
 
-                            // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
-                            Log.d("NEWS "+pos,"DOwnloaded");
-                        }
+                            @Override
+                            public void onFailure(Call<NewsItem> call, Throwable t) {
+                                Log.d("NEWS_FAIL_0", t.getMessage());
+                            }
+                        });
+                        break;
+                    case 1:
+                        call = api.getTopSportNews();
+                        call.enqueue(new Callback<NewsItem>() {
+                            @Override
+                            public void onResponse(Call<NewsItem> call, Response<NewsItem> response) {
+                                //newsList[pos] = response.body();
+                                Articles[] articles = response.body().getArticles();
+                                for (int i = 0; i < articles.length; i++) {
+                                    News news = new News(articles[i].getTitle(), articles[i].getUrlToImage(), articles[i].getUrl(), articles[i].getPublishedAt(), 1);
+                                    newsDbHandler.insertNews(news);
+                                    Log.d("NEWS_DB_1", news.getTitle() + " Type: 1");
+                                    setCount();
+                                }
 
-                        @Override
-                        public void onFailure(Call<NewsItem> call, Throwable t) {
-                            Log.d("NEWS_FAIL",t.getMessage());
-                            // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
-                        }
-                    });
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                                // Log.d("NEWS "+pos,"DOwnloaded");
+                            }
+
+                            @Override
+                            public void onFailure(Call<NewsItem> call, Throwable t) {
+                                Log.d("NEWS_FAIL_1", t.getMessage());
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                            }
+                        });
+                        break;
+                    case 2:
+                        call = api.getTopBusinessNews();
+                        call.enqueue(new Callback<NewsItem>() {
+                            @Override
+                            public void onResponse(Call<NewsItem> call, Response<NewsItem> response) {
+                                //newsList[pos] = response.body();
+                                Articles[] articles = response.body().getArticles();
+                                for (int i = 0; i < articles.length; i++) {
+                                    News news = new News(articles[i].getTitle(), articles[i].getUrlToImage(), articles[i].getUrl(), articles[i].getPublishedAt(), 2);
+                                    newsDbHandler.insertNews(news);
+                                    Log.d("NEWS_DB_2", news.getTitle() + " Type: 2");
+                                    setCount();
+                                }
+
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                                // Log.d("NEWS "+pos,"DOwnloaded");
+                            }
+
+                            @Override
+                            public void onFailure(Call<NewsItem> call, Throwable t) {
+                                Log.d("NEWS_FAIL_2", t.getMessage());
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                            }
+                        });
+                        break;
+                    case 3:
+                        call = api.getTopHealthNews();
+                        call.enqueue(new Callback<NewsItem>() {
+                            @Override
+                            public void onResponse(Call<NewsItem> call, Response<NewsItem> response) {
+                                //newsList[pos] = response.body();
+                                Articles[] articles = response.body().getArticles();
+                                for (int i = 0; i < articles.length; i++) {
+                                    News news = new News(articles[i].getTitle(), articles[i].getUrlToImage(), articles[i].getUrl(), articles[i].getPublishedAt(), 3);
+                                    newsDbHandler.insertNews(news);
+                                    Log.d("NEWS_DB_3", news.getTitle() + " Type: 3");
+                                    setCount();
+                                }
+
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                                // Log.d("NEWS "+pos,"DOwnloaded");
+                            }
+
+                            @Override
+                            public void onFailure(Call<NewsItem> call, Throwable t) {
+                                Log.d("NEWS_FAIL_3", t.getMessage());
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                            }
+                        });
+                        break;
+                    case 4:
+                        call = api.getTopScienceNews();
+                        call.enqueue(new Callback<NewsItem>() {
+                            @Override
+                            public void onResponse(Call<NewsItem> call, Response<NewsItem> response) {
+                                //newsList[pos] = response.body();
+                                Articles[] articles = response.body().getArticles();
+                                for (int i = 0; i < articles.length; i++) {
+                                    News news = new News(articles[i].getTitle(), articles[i].getUrlToImage(), articles[i].getUrl(), articles[i].getPublishedAt(), 4);
+                                    newsDbHandler.insertNews(news);
+                                    Log.d("NEWS_DB_4", news.getTitle() + " Type: 4");
+                                    setCount();
+                                }
+
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                                // Log.d("NEWS "+pos,"DOwnloaded");
+                            }
+
+                            @Override
+                            public void onFailure(Call<NewsItem> call, Throwable t) {
+                                Log.d("NEWS_FAIL_4", t.getMessage());
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                            }
+                        });
+                        break;
+                    case 5:
+                        call = api.getTopTechNews();
+                        call.enqueue(new Callback<NewsItem>() {
+                            @Override
+                            public void onResponse(Call<NewsItem> call, Response<NewsItem> response) {
+                                //newsList[pos] = response.body();
+                                Articles[] articles = response.body().getArticles();
+                                for (int i = 0; i < articles.length; i++) {
+                                    News news = new News(articles[i].getTitle(), articles[i].getUrlToImage(), articles[i].getUrl(), articles[i].getPublishedAt(), 5);
+                                    newsDbHandler.insertNews(news);
+                                    Log.d("NEWS_DB_5", news.getTitle() + " Type: 5");
+                                    setCount();
+                                }
+
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                                // Log.d("NEWS "+pos,"DOwnloaded");
+                            }
+
+                            @Override
+                            public void onFailure(Call<NewsItem> call, Throwable t) {
+                                Log.d("NEWS_FAIL_5", t.getMessage());
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                            }
+                        });
+                        break;
+                    case 6:
+                        call = api.getTopEntertainmentNews();
+                        call.enqueue(new Callback<NewsItem>() {
+                            @Override
+                            public void onResponse(Call<NewsItem> call, Response<NewsItem> response) {
+                                //newsList[pos] = response.body();
+                                Articles[] articles = response.body().getArticles();
+                                for (int i = 0; i < articles.length; i++) {
+                                    News news = new News(articles[i].getTitle(), articles[i].getUrlToImage(), articles[i].getUrl(), articles[i].getPublishedAt(), 6);
+                                    newsDbHandler.insertNews(news);
+                                    Log.d("NEWS_DB_6", news.getTitle() + " Type: 6");
+                                    setCount();
+                                }
+
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                                // Log.d("NEWS "+pos,"DOwnloaded");
+                            }
+
+                            @Override
+                            public void onFailure(Call<NewsItem> call, Throwable t) {
+                                Log.d("NEWS_FAIL_6", t.getMessage());
+                                // newsView.setAdapter(new NewsListAdapter(newsList,getContext()));
+                            }
+                        });
+                        break;
+                    case 7:
+                        break;
                 }
             }
+
+            while(count<7);
+            Log.d("COMP","DONE");
             isDone = true;
         }
         else {
-            Toast.makeText(context, "Please check your Internet connection!", Toast.LENGTH_SHORT).show();
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, "Please check your Internet connection!", Toast.LENGTH_SHORT).show();
+                }
+            });
             isDone = false;
         }
         return null;
     }
+
+    private void setCount()
+    {
+        count++;
+    }
+
 }
+
